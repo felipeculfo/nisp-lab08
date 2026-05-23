@@ -10,79 +10,14 @@
 <body>
 
     <main class="cart-container">
-        <header class="cart-header">
-            <h1>Twój Koszyk</h1>
-            <span class="cart-badge">3 produkty</span>
-        </header>
-
-        <!-- Lista produktów w koszyku -->
-        <ul class="cart-list">
+        <!-- Główny kontener aplikacji – JS wstrzykuje tu dynamicznie cały widok -->
+        <div id="cart-app">
             
-            <li class="cart-item">
-                <div class="item-details">
-                    <span class="item-name">Kawa ziarnista Arabica</span>
-                    <span class="item-unit-price">65,00 zł / szt.</span>
-                </div>
-                
-                <div class="item-actions">
-                    <div class="quantity-controls">
-                        <button type="button" class="qty-btn" aria-label="Zmniejsz">−</button>
-                        <input type="number" class="qty-input" value="2" min="1" readonly>
-                        <button type="button" class="qty-btn" aria-label="Zwiększ">+</button>
-                    </div>
-                    <span class="item-total-price">130,00 zł</span>
-                    <button type="button" class="delete-button" aria-label="Usuń z koszyka">✕</button>
-                </div>
-            </li>
+            <!-- Tu domyślnie pojawi się stan ładowania lub widok wygenerowany przez JS.
+                 Dzięki temu unikamy niespójności danych przed załadowaniem skryptu. -->
+            <p class="cart-loading">Ładowanie koszyka...</p>
 
-            <li class="cart-item">
-                <div class="item-details">
-                    <span class="item-name">Chleb żytni na zakwasie</span>
-                    <span class="item-unit-price">12,50 zł / szt.</span>
-                </div>
-                
-                <div class="item-actions">
-                    <div class="quantity-controls">
-                        <button type="button" class="qty-btn" aria-label="Zmniejsz">−</button>
-                        <input type="number" class="qty-input" value="1" min="1" readonly>
-                        <button type="button" class="qty-btn" aria-label="Zwiększ">+</button>
-                    </div>
-                    <span class="item-total-price">12,50 zł</span>
-                    <button type="button" class="delete-button" aria-label="Usuń z koszyka">✕</button>
-                </div>
-            </li>
-
-            <li class="cart-item">
-                <div class="item-details">
-                    <span class="item-name">Mleko owsiane Barista</span>
-                    <span class="item-unit-price">9,00 zł / szt.</span>
-                </div>
-                
-                <div class="item-actions">
-                    <div class="quantity-controls">
-                        <button type="button" class="qty-btn" aria-label="Zmniejsz">−</button>
-                        <input type="number" class="qty-input" value="3" min="1" readonly>
-                        <button type="button" class="qty-btn" aria-label="Zwiększ">+</button>
-                    </div>
-                    <span class="item-total-price">27,00 zł</span>
-                    <button type="button" class="delete-button" aria-label="Usuń z koszyka">✕</button>
-                </div>
-            </li>
-
-        </ul>
-
-        <!-- Podsumowanie koszyka -->
-        <footer class="cart-summary">
-            <div class="summary-row">
-                <span>Razem do zapłaty:</span>
-                <span class="summary-total">169,50 zł</span>
-            </div>
-            
-            <form action="/checkout" method="POST" class="checkout-form">
-                <textarea class="order-notes" placeholder="Dodatkowe uwagi do zamówienia (opcjonalnie)..."></textarea>
-                <button type="submit" class="checkout-button">Przejdź do zamówienia</button>
-            </form>
-        </footer>
+        </div>
     </main>
 
 </body>
