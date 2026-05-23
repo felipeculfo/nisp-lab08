@@ -1,25 +1,26 @@
-// 1. Domyślne dane (jeśli koszyk w localStorage jest pusty lub aplikacja jest uruchamiana pierwszy raz)
+// 1. Domyślne dane i konfiguracja sklepu
 const defaultItems = [
     { id: 1, name: "Kawa ziarnista Arabica", price: 65.00, qty: 2 },
     { id: 2, name: "Chleb żytni na zakwasie", price: 12.50, qty: 1 },
     { id: 3, name: "Mleko owsiane Barista", price: 9.00, qty: 3 }
 ];
 
-// 2. Inicjalizacja stanu: Odczyt z localStorage
+// NOWOŚĆ: Konfiguracja kosztów dostawy
+const FREE_SHIPPING_THRESHOLD = 150.00;
+const STANDARD_SHIPPING_COST = 15.00;
+
 let state = {
     items: JSON.parse(localStorage.getItem('cart_items')) || defaultItems,
     notes: localStorage.getItem('cart_notes') || "",
-    isOrdered: false // Nowa właściwość flagująca stan ukończenia zamówienia
+    isOrdered: false
 };
 
-// Pomocnicza funkcja do formatowania waluty (np. 65.00 -> 65,00 zł)
 const formatPrice = (value) => value.toFixed(2).replace('.', ',') + ' zł';
 
-// 3. Logika wyświetlania (Renderowanie interfejsu)
+// 3. Logika wyświetlania
 const render = () => {
     const appContainer = document.getElementById('cart-app');
 
-    // Przypadek A: Zamówienie zostało właśnie sfinalizowane i koszyk wyczyszczony
     if (state.isOrdered) {
         appContainer.innerHTML = `
             <header class="cart-header">
@@ -33,11 +34,10 @@ const render = () => {
         return;
     }
 
-    // Obliczenia na bieżąco: łączna liczba produktów i całkowita cena
+    // Obliczenia na bieżąco
     const totalItemsCount = state.items.reduce((acc, item) => acc + item.qty, 0);
-    const totalPrice = state.items.reduce((acc, item) => acc + (item.price * item.qty), 0);
+    const itemsTotalValue = state.items.reduce((acc, item) => acc + (item.price * item.qty), 0);
 
-    // Przypadek B: Koszyk jest pusty (standardowo)
     if (state.items.length === 0) {
         appContainer.innerHTML = `
             <header class="cart-header">
@@ -51,18 +51,34 @@ const render = () => {
         return; 
     }
 
-    // Przypadek C: W koszyku są produkty (standardowy widok)
+    // NOWOŚĆ: Logika dynamicznej dostawy
+    const isShippingFree = itemsTotalValue >= FREE_SHIPPING_THRESHOLD;
+    const shippingCost = isShippingFree ? 0 : STANDARD_SHIPPING_COST;
+    const totalOrderValue = itemsTotalValue + shippingCost;
+    const amountMissingForFreeShipping = FREE_SHIPPING_THRESHOLD - itemsTotalValue;
+    const progressPercentage = Math.min((itemsTotalValue / FREE_SHIPPING_THRESHOLD) * 100, 100);
+
     appContainer.innerHTML = `
         <header class="cart-header" style="display: flex; justify-content: space-between; align-items: center;">
             <div>
                 <h1>Twój Koszyk</h1>
                 <span class="cart-badge">${totalItemsCount} ${totalItemsCount === 1 ? 'produkt' : 'produkty'}</span>
             </div>
-            <!-- Przycisk deklaratywnego czyszczenia koszyka w nagłówku -->
             <button type="button" class="clear-cart-btn" onclick="clearCart()" style="background: none; border: 1px solid #e74c3c; color: #e74c3c; padding: 6px 12px; border-radius: 6px; cursor: pointer;">
                 Wyczyść koszyk
             </button>
         </header>
+
+        <div class="free-shipping-tracker" style="background: #e8f5e9; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+            <p style="margin-bottom: 8px; font-size: 14px; color: #2e7d32; font-weight: bold; text-align: center;">
+                ${isShippingFree 
+                    ? '🎉 Masz darmową dostawę!' 
+                    : `Brakuje Ci jeszcze <span style="font-size: 16px;">${formatPrice(amountMissingForFreeShipping)}</span> do darmowej dostawy!`}
+            </p>
+            <div style="background: #c8e6c9; height: 8px; border-radius: 4px; overflow: hidden;">
+                <div style="width: ${progressPercentage}%; background: #4caf50; height: 100%; transition: width 0.3s ease;"></div>
+            </div>
+        </div>
 
         <ul class="cart-list">
             ${state.items.map(item => `
@@ -86,21 +102,22 @@ const render = () => {
         </ul>
 
         <footer class="cart-summary">
-            <!-- Rozbudowane podsumowanie kosztów -->
             <div class="summary-details" style="margin-bottom: 15px; border-bottom: 1px dashed #e0e0e0; padding-bottom: 15px;">
                 <div class="summary-row" style="display: flex; justify-content: space-between; margin-bottom: 8px; color: #7f8c8d;">
                     <span>Suma częściowa (${totalItemsCount} szt.):</span>
-                    <span>${formatPrice(totalPrice)}</span>
+                    <span>${formatPrice(itemsTotalValue)}</span>
                 </div>
                 <div class="summary-row" style="display: flex; justify-content: space-between; margin-bottom: 8px; color: #7f8c8d;">
                     <span>Dostawa:</span>
-                    <span style="color: #2e7d32; font-weight: bold;">Darmowa</span>
+                    <span style="${isShippingFree ? 'color: #2e7d32; font-weight: bold;' : ''}">
+                        ${isShippingFree ? 'Darmowa' : formatPrice(shippingCost)}
+                    </span>
                 </div>
             </div>
 
             <div class="summary-row" style="display: flex; justify-content: space-between; margin-bottom: 20px;">
                 <span style="font-weight: bold; font-size: 18px;">Razem do zapłaty:</span>
-                <span class="summary-total" style="font-weight: bold; font-size: 22px; color: #2c3e50;">${formatPrice(totalPrice)}</span>
+                <span class="summary-total" style="font-weight: bold; font-size: 22px; color: #2c3e50;">${formatPrice(totalOrderValue)}</span>
             </div>
             
             <form action="/checkout" method="POST" class="checkout-form" onsubmit="handleCheckout(event)">
@@ -115,14 +132,12 @@ const render = () => {
     `;
 };
 
-// 4. Logika modyfikacji stanu i zapisu do localStorage
 const syncStorageAndRender = () => {
     localStorage.setItem('cart_items', JSON.stringify(state.items));
     localStorage.setItem('cart_notes', state.notes);
     render();
 };
 
-// Funkcja całkowitego czyszczenia koszyka
 window.clearCart = () => {
     state.items = [];
     state.notes = "";
@@ -150,25 +165,24 @@ window.updateNotes = (event) => {
     localStorage.setItem('cart_notes', state.notes);
 };
 
-// Finalizacja zamówienia: Czyścimy magazyn i podnosimy flagę sukcesu
 window.handleCheckout = (event) => {
     event.preventDefault();
     
-    // Logika biznesowa wysyłki zamówienia na podstawie obecnego stanu
-    const totalOrderValue = state.items.reduce((acc, item) => acc + (item.price * item.qty), 0);
-    alert("Zamówienie na kwotę: " + formatPrice(totalOrderValue) + " zostało wysłane!");
+    // Używamy tych samych obliczeń co w render, by znać finalną cenę przy kasie
+    const itemsTotalValue = state.items.reduce((acc, item) => acc + (item.price * item.qty), 0);
+    const shippingCost = itemsTotalValue >= FREE_SHIPPING_THRESHOLD ? 0 : STANDARD_SHIPPING_COST;
+    const finalOrderTotal = itemsTotalValue + shippingCost;
 
-    // Deklaratywne czyszczenie struktur danych po zakupie
+    alert("Zamówienie na kwotę: " + formatPrice(finalOrderTotal) + " zostało wysłane!");
+
     state.items = [];
     state.notes = "";
-    state.isOrdered = true; // Zmiana stanu wywoła ekran sukcesu w funkcji render()
+    state.isOrdered = true; 
 
-    // Czyszczenie fizycznego localStorage
     localStorage.removeItem('cart_items');
     localStorage.removeItem('cart_notes');
 
     render();
 };
 
-// 5. Uruchomienie aplikacji po załadowaniu skryptu
 render();
