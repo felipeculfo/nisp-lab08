@@ -1,40 +1,43 @@
-// 1. Deklaratywne Źródło Prawdy (Stan aplikacji)
-// Dane początkowe w przypadku braku zapisu w localStorage
+// 1. Domyślne dane (jeśli koszyk w localStorage jest pusty lub aplikacja jest uruchamiana pierwszy raz)
 const defaultItems = [
     { id: 1, name: "Kawa ziarnista Arabica", price: 65.00, qty: 2 },
     { id: 2, name: "Chleb żytni na zakwasie", price: 12.50, qty: 1 },
     { id: 3, name: "Mleko owsiane Barista", price: 9.00, qty: 3 }
 ];
 
+// 2. Inicjalizacja stanu: Odczyt z localStorage
 let state = {
+    // Próbujemy pobrać zapisane przedmioty, jeśli ich nie ma - używamy defaultItems
     items: JSON.parse(localStorage.getItem('cart_items')) || defaultItems,
     notes: localStorage.getItem('cart_notes') || ""
 };
 
-// Pomocniczy Formater Walut (czysta funkcja transformacji danych)
+// Pomocnicza funkcja do formatowania waluty (np. 65.00 -> 65,00 zł)
 const formatPrice = (value) => value.toFixed(2).replace('.', ',') + ' zł';
 
-// 2. Deklaratywny Opis Interfejsu (Mapowanie stanu na HTML)
+// 3. Logika wyświetlania (Renderowanie interfejsu)
 const render = () => {
     const appContainer = document.getElementById('cart-app');
 
-    // Obliczenia pochodne ze stanu – dzieją się automatycznie przy każdym renderze
+    // Obliczenia na bieżąco: łączna liczba produktów i całkowita cena
     const totalItemsCount = state.items.reduce((acc, item) => acc + item.qty, 0);
     const totalPrice = state.items.reduce((acc, item) => acc + (item.price * item.qty), 0);
 
-    // Jeśli koszyk jest pusty, deklarujemy zupełnie inny widok
+    // Przypadek: Koszyk jest pusty
     if (state.items.length === 0) {
         appContainer.innerHTML = `
             <header class="cart-header">
                 <h1>Twój Koszyk</h1>
                 <span class="cart-badge">0 produktów</span>
             </header>
-            <p class="empty-cart-message">Twój koszyk jest pusty.</p>
+            <p class="empty-cart-message" style="text-align: center; padding: 20px; color: #7f8c8d;">
+                Twój koszyk jest pusty.
+            </p>
         `;
-        return;
+        return; // Zatrzymujemy dalsze renderowanie
     }
 
-    // Pełny opis struktury interfejsu zintegrowany z aktualnymi danymi
+    // Przypadek: W koszyku są produkty
     appContainer.innerHTML = `
         <header class="cart-header">
             <h1>Twój Koszyk</h1>
@@ -80,10 +83,9 @@ const render = () => {
     `;
 };
 
-// 3. Czyste Mutacje Stanu (Brak efektów ubocznych wewnątrz logiki biznesowej)
+// 4. Logika modyfikacji stanu i zapisu do localStorage
 const syncStorageAndRender = () => {
     localStorage.setItem('cart_items', JSON.stringify(state.items));
-    localStorage.setItem('cart_notes', state.notes);
     render();
 };
 
@@ -91,11 +93,11 @@ window.updateQty = (id, change) => {
     state.items = state.items.map(item => {
         if (item.id === id) {
             const newQty = item.qty + change;
-            return { ...item, qty: newQty < 1 ? 1 : newQty };
+            return { ...item, qty: newQty < 1 ? 1 : newQty }; // Nie pozwalamy na ilość mniejszą niż 1
         }
         return item;
     });
-    syncStorageAndRender();
+    syncStorageAndRender(); // Zapis i odświeżenie widoku
 };
 
 window.deleteItem = (id) => {
@@ -105,14 +107,13 @@ window.deleteItem = (id) => {
 
 window.updateNotes = (event) => {
     state.notes = event.target.value;
-    localStorage.setItem('cart_notes', state.notes); // Zapis uwag na bieżąco, bez pełnego rerenderu pola tekstowego (aby nie zgubić focusu)
+    localStorage.setItem('cart_notes', state.notes);
 };
 
 window.handleCheckout = (event) => {
     event.preventDefault();
-    console.log("Wysyłanie zamówienia:", state);
-    // Tutaj deklaratywna obsługa wysyłki danych dalej...
+    alert("Zamówienie na kwotę: " + formatPrice(state.items.reduce((acc, item) => acc + (item.price * item.qty), 0)) + " zostało złożone!");
 };
 
-// 4. Pierwsze uruchomienie aplikacji
+// 5. Uruchomienie aplikacji po załadowaniu skryptu
 render();
