@@ -1,0 +1,180 @@
+/* Reset i podstawowe style globalne */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f4f7f6;
+    color: #2c3e50;
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+/* Kontener główny */
+.shopping-list-container {
+    background: #ffffff;
+    width: 100%;
+    max-width: 500px;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+/* Nagłówek */
+.list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.list-header h1 {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.list-badge {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Formularz dodawania */
+.add-item-form {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 30px;
+}
+
+.item-input {
+    flex: 1;
+    padding: 14px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 16px;
+    transition: border-color 0.2s;
+}
+
+.item-input:focus {
+    outline: none;
+    border-color: #4caf50;
+}
+
+.add-button {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 0 24px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.add-button:hover {
+    background-color: #43a047;
+}
+
+/* Lista przedmiotów */
+.shopping-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    transition: background-color 0.2s;
+}
+
+.list-item:hover {
+    background-color: #f1f3f5;
+}
+
+/* Stylizacja Checkboxa i etykiety */
+.item-label {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    flex: 1;
+}
+
+/* Ukrywamy domyślny checkbox, ale zostawiamy go dostępnym dla klawiatury */
+.item-checkbox {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* Nasz własny, ładny checkbox */
+.custom-checkbox {
+    width: 22px;
+    height: 22px;
+    border: 2px solid #b0bec5;
+    border-radius: 6px;
+    display: inline-block;
+    position: relative;
+    transition: all 0.2s;
+}
+
+/* Deklaratywna zmiana stanu: gdy checkbox jest zaznaczony */
+.item-checkbox:checked + .custom-checkbox {
+    background-color: #4caf50;
+    border-color: #4caf50;
+}
+
+/* Ptaszek wewnątrz zaznaczonego checkboxa */
+.item-checkbox:checked + .custom-checkbox::after {
+    content: "";
+    position: absolute;
+    left: 7px;
+    top: 3px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* Nazwa przedmiotu */
+.item-name {
+    font-size: 16px;
+    transition: all 0.2s;
+}
+
+/* Deklaratywne przekreślenie tekstu po zaznaczeniu */
+.item-checkbox:checked ~ .item-name {
+    color: #90a4ae;
+    text-decoration: line-through;
+}
+
+/* Przycisk usuwania */
+.delete-button {
+    background: none;
+    border: none;
+    color: #b0bec5;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px;
+    transition: color 0.2s;
+}
+
+.delete-button:hover {
+    color: #ef5350;
+}

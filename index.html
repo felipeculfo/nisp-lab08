@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <title>Page Title</title>
+    <link rel='stylesheet' href='style.css'>
+    <script src="app.js"></script>
+</head>
+<body>
+
+    <main class="shopping-list-container">
+        <header class="list-header">
+            <h1>Moja Lista Zakupów</h1>
+            <span class="list-badge">Pozostało: 3</span>
+        </header>
+
+        <!-- Formularz dodawania (Deklaratywny UI) -->
+        <form class="add-item-form" action="#" method="POST">
+            <input 
+                type="text" 
+                class="item-input" 
+                placeholder="Co musisz kupić? (np. Mleko owsiane)" 
+                required
+            >
+            <button type="submit" class="add-button">Dodaj</button>
+        </form>
+
+        <!-- Lista przedmiotów -->
+        <ul class="shopping-list">
+            
+            <li class="list-item">
+                <label class="item-label">
+                    <input type="checkbox" class="item-checkbox">
+                    <span class="custom-checkbox"></span>
+                    <span class="item-name">Świeży szpinak</span>
+                </label>
+                <button type="button" class="delete-button" aria-label="Usuń">✕</button>
+            </li>
+
+            <li class="list-item">
+                <label class="item-label">
+                    <input type="checkbox" class="item-checkbox" checked>
+                    <span class="custom-checkbox"></span>
+                    <span class="item-name">Kawa ziarnista</span>
+                </label>
+                <button type="button" class="delete-button" aria-label="Usuń">✕</button>
+            </li>
+
+            <li class="list-item">
+                <label class="item-label">
+                    <input type="checkbox" class="item-checkbox">
+                    <span class="custom-checkbox"></span>
+                    <span class="item-name">Chleb żytni na zakwasie</span>
+                </label>
+                <button type="button" class="delete-button" aria-label="Usuń">✕</button>
+            </li>
+
+        </ul>
+    </main>
+
+</body>
+</html>
